@@ -1,0 +1,44 @@
+---
+title: Preprocessing data
+author: Sebastian Robledo
+date: "Nov 20, 2022"
+format:
+    html:   
+        code-fold: true
+---
+
+The data is in this link
+https://drive.google.com/drive/u/1/folders/1nwv_jgXQhLbLJVh0dVgh9GSzV_VUj821
+
+```{python setup, include=FALSE}
+
+import pandas as pd
+# run file from the root of the project called "groups_preprocessing.py"
+%run groups_preprocessing.py
+```
+
+# Preprocessing data
+```{python}
+# create a variable called "groups_raw" from the url "https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0"
+groups_raw = pd.read_csv("https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0")
+
+# Run the function "preprocess_groups" on the variable "groups_raw"
+institutions_1 = preprocessing_groups_institutions(groups_raw)
+```
+
+```{python}
+# Show me the shape of the variable "groups"
+institutions_1.shape
+```
+
+```{python}
+url='https://drive.google.com/file/d/1KrG-06OFCusN2JpgaqtaC4dl6sCpVaaX/view?usp=share_link'
+url='https://drive.google.com/uc?id=' + url.split('/')[-2]
+papers = pd.read_csv(url)
+```
+
+```{python}
+df.shape
+```
+
+```{python}

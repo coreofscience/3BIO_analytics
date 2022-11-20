@@ -29,4 +29,19 @@ def preprocessing_groups_institutions(data):
     # Create a dataframe called institutions_cleaned by merging institutions_groups, institutions_category and institutions_year
     institutions_cleaned = institutions_groups.to_frame().merge(institutions_category, left_index=True, right_index=True).merge(institutions_year, left_index=True, right_index=True)
     
+    # Change the name of the column "groups" to "total_groups" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"groups": "total_groups"})
+
+    # Change the name of the column "A" to "Group_A" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"A": "Group_A"})
+
+    # Change the name of the column "B" to "Group_B" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"B": "Group_B"})
+
+    # Change the name of the column "C" to "Group_C" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"C": "Group_C"})
+
+    # Change the name of the column "Grupo reconocido" to "Group_no_category" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"Grupo reconocido": "Group_no_category"})
+
     return institutions_cleaned

@@ -59,10 +59,6 @@ dummy_1= researchers.groupby(['codigo_grupo']).size().reset_index(name='counts')
 
 researchers_institutions = groups_raw[['codigo del grupo', 'instituciones']].merge(dummy_1, left_on='codigo del grupo', right_on= 'codigo_grupo', how='left')
 ```
-```
-
-
-
 
 
 ```{python}

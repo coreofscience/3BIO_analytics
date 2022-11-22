@@ -35,6 +35,9 @@ def preprocessing_groups_institutions(data):
     # Change the name of the column "A" to "Group_A" in institutions_cleaned
     institutions_cleaned = institutions_cleaned.rename(columns={"A": "Group_A"})
 
+    # Change the name of the column "A1" to "Group_A1" in institutions_cleaned
+    institutions_cleaned = institutions_cleaned.rename(columns={"A1": "Group_A1"})
+
     # Change the name of the column "B" to "Group_B" in institutions_cleaned
     institutions_cleaned = institutions_cleaned.rename(columns={"B": "Group_B"})
 
@@ -45,3 +48,36 @@ def preprocessing_groups_institutions(data):
     institutions_cleaned = institutions_cleaned.rename(columns={"Grupo reconocido": "Group_no_category"})
 
     return institutions_cleaned
+
+# Create a function with the name "preprocessing_groups_papers" that receives the dataframe "papers_raw" and "groups_raw" as a parameters and run all the code above. Return the dataframe "institutions_papers_3"
+
+def preprocessing_groups_papers(papers_raw, groups_raw):
+
+    # Create a dataframe called institutions_papers_1 with the matrix of the count of unique values in the column "codigo_grupo" and "publindex" from papers_raw    
+    institutions_papers_1 = pd.crosstab(papers_raw["codigo_grupo"], papers_raw["publindex"])
+
+    # from the dataframe "groups_raw" select the columns "codigo del grupo" and "instituciones" and save it in a dataframe called "institutions_groups_names", also change the column name to "codigo_grupo" and "instituciones"
+    institutions_groups_names = groups_raw[["codigo del grupo", "instituciones"]]
+    institutions_groups_names.columns = ["codigo_grupo", "instituciones"]
+
+    # from the dataframe "institutions_groups_names" filter the unique values and save the results in a dataframe called "institutions_groups_names_unique"
+    institutions_groups_names_unique = institutions_groups_names.drop_duplicates(subset=['codigo_grupo'])
+
+    # Merge the dataframe "institutions_groups_names" with the dataframe "institutions_papers_1" on the column "codigo_grupo"
+    institutions_papers_2 = pd.merge(institutions_groups_names_unique, institutions_papers_1, on="codigo_grupo")
+
+    # Remove the column "codigo_grupo" from the dataframe "institutions_papers_2"
+    institutions_papers_2 = institutions_papers_2.drop(columns=["codigo_grupo"])
+
+    # Create a dataframe called "institutions_papers_3" with the group by of the dataframe "institutions_papers_2" by the column "instituciones" and sum the values
+    institutions_papers_3 = institutions_papers_2.groupby(["instituciones"]).sum()
+
+    # Create a new column in the dataframe "institutions_papers_3" called "total" with the sum of the values of the dataframe "institutions_papers_3"
+    institutions_papers_3["total"] = institutions_papers_3.sum(axis=1)
+
+    return institutions_papers_3
+
+
+
+
+

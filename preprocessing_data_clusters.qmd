@@ -19,32 +19,32 @@ import pandas as pd
 
 # Preprocessing Groups
 ```{python}
-# create a variable called "groups_raw" from the url "https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0"
-groups = "https://drive.google.com/file/d/1JNncMKuaXSwuQEp-S6wui4jiDcPGoCkU/view?usp=sharing"
-groups = 'https://drive.google.com/uc?id=' + groups.split('/')[-2]
-groups_raw = pd.read_csv("https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0")
+# create a variable called "groups_raw" from the url "https://drive.google.com/file/d/1JNncMKuaXSwuQEp-S6wui4jiDcPGoCkU/view?usp=share_link""
+groups_url = "https://drive.google.com/file/d/1JNncMKuaXSwuQEp-S6wui4jiDcPGoCkU/view?usp=share_link"
+groups_url = 'https://drive.google.com/uc?id=' + groups_url.split('/')[-2]
+groups_raw = pd.read_csv(groups_url)
 # Run the function "preprocess_groups" on the variable "groups_raw"
-groups = preprocessing_groups_institutions(groups_raw)
+institution_groups = preprocessing_groups_institutions(groups_raw)
+del groups_url
 ```
+
 
 # Preprocessing products
-```{python}
-# create a variable called "groups_raw" from the url "https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0"
-papers = "https://drive.google.com/file/d/1KrG-06OFCusN2JpgaqtaC4dl6sCpVaaX/view?usp=share_link"
-papers = 'https://drive.google.com/uc?id=' + papers.split('/')[-2]
-papers = pd.read_csv(papers)
 
+## Papers
+
+```{python}
+# create a variable called "groups_raw" from the url "https://drive.google.com/file/d/1KrG-06OFCusN2JpgaqtaC4dl6sCpVaaX/view?usp=share_link"
+papers_url = "https://drive.google.com/file/d/1KrG-06OFCusN2JpgaqtaC4dl6sCpVaaX/view?usp=share_link"
+papers_url = 'https://drive.google.com/uc?id=' + papers_url.split('/')[-2]
+papers_raw = pd.read_csv(papers_url)
+del papers_url
 # Group by "codigo_grupo" and count the number of values in column "titulo", save the data in dataframe called "dummy"
-dummy = papers.groupby(['codigo_grupo']).size().reset_index(name='counts')
+# institutions_papers = papers.groupby(['codigo_grupo']).size().reset_index(name='counts')
+# Run the function "preprocessing_groups_papers" on the variable "papers_raw" and "groups_raw", save the data in dataframe called "institutions_papers"
+institutions_papers = preprocessing_groups_papers(papers_raw, groups_raw)
 ```
 
-python code
-```{python}
-# from groups_raw select the columns "codigo_grupo" and "instituciones", and merge with dummy by "codigo_grupo" and "codigo del grupo"
-#groups = groups_raw[['codigo_grupo', 'instituciones']].merge(dummy, on='codigo_grupo')
-
-papers_institutions = groups_raw[['codigo del grupo', 'instituciones']].merge(dummy, left_on='codigo del grupo', right_on= 'codigo_grupo')
-```
 # Preprocessing researchers
 
 ```{python}

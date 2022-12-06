@@ -11,14 +11,20 @@ def preprocessing_groups_institutions(data):
     # Change the name of the column "instituciones" to "groups" in institutions_groups
     institutions_groups = institutions_groups.rename("groups")
 
-    # Remove the strings "Categoría " from the column "estado" in groups_raw
-    data["estado"] = data["estado"].str.replace("Categoría ", "")
+    # Remove the strings "Categoría " from the column "Estado" in groups_raw
+    data["Estado"] = data["Estado"].str.replace("Categoría ", "")
 
     # Values equals to "00" in the column "estado" in groups_raw are replaced by "Grupo reconocido"
-    data["estado"] = data["estado"].replace("00", "Grupo reconocido")
+    data["Estado"] = data["Estado"].replace("00", "Grupo reconocido")
 
     # Create a dataframe called institutions_gropus with the matrix of the values in the column "instituciones" and "estado" from groups_raw
-    institutions_category = pd.crosstab(data["instituciones"], data["estado"])
+    institutions_category = pd.crosstab(data["instituciones"], data["Estado"])
+
+    # Extract the first four characters from the column "Año y mes de formación" in data
+    data["Año y mes de formación"] = data["Año y mes de formación"].str[:4]
+
+    # Change the name of the column "Año y mes de formación" to "anio" in data
+    data = data.rename(columns={"Año y mes de formación": "anio"})
 
     # Create a dataframe called institutions_year with the unique values of "instituciones" and "anio" from groups_raw
     institutions_year = data[["instituciones", "anio"]].drop_duplicates()
@@ -54,10 +60,10 @@ def preprocessing_groups_institutions(data):
 def preprocessing_groups_papers(papers_raw, groups_raw):
 
     # Create a dataframe called institutions_papers_1 with the matrix of the count of unique values in the column "codigo_grupo" and "publindex" from papers_raw    
-    institutions_papers_1 = pd.crosstab(papers_raw["codigo_grupo"], papers_raw["publindex"])
+    institutions_papers_1 = pd.crosstab(papers_raw["codigo_grupo"], papers_raw["Publindex"])
 
-    # from the dataframe "groups_raw" select the columns "codigo del grupo" and "instituciones" and save it in a dataframe called "institutions_groups_names", also change the column name to "codigo_grupo" and "instituciones"
-    institutions_groups_names = groups_raw[["codigo del grupo", "instituciones"]]
+    # from the dataframe "groups_raw" select the columns "Código del grupo" and "instituciones" and save it in a dataframe called "institutions_groups_names", also change the column name to "codigo_grupo" and "instituciones"
+    institutions_groups_names = groups_raw[["Código del grupo", "instituciones"]]
     institutions_groups_names.columns = ["codigo_grupo", "instituciones"]
 
     # from the dataframe "institutions_groups_names" filter the unique values and save the results in a dataframe called "institutions_groups_names_unique"

@@ -1,5 +1,6 @@
 # Import pandas as pd
 import pandas as pd
+import numpy as np
 # Create a function with the name "preprocessing_data_clusters" that receives the dataframe "data" as a parameter and run all the code above
 def preprocessing_groups_institutions(data):
     # Create a dataframe called institutions_groups with the column "instituciones" from groups_raw
@@ -82,6 +83,55 @@ def preprocessing_groups_papers(papers_raw, groups_raw):
     institutions_papers_3["total"] = institutions_papers_3.sum(axis=1)
 
     return institutions_papers_3
+
+# Create a function with the name "preprocessing_researches_papers" that receives the dataframe "groups_raw" and "researchers" as a parameters and run all the code above. Return the dataframe "researchers_selectedXInstitucion"
+def preprocessing_researches_papers(researchers, groups_raw):
+    # create a variable called "researchers_raw" from the url "https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0"
+    #researchers_url = "https://drive.google.com/file/d/143u1k6A-LZDhhSGvREzNaXYT4aUEZlGN/view?usp=share_link"
+    #researchers_raw = 'https://drive.google.com/uc?id=' + researchers_url.split('/')[-2]
+    #researchers = pd.read_csv(researchers_raw)
+    # select the columns  "codigo_grupo", "categoria","posgrado", "fin vinculacion"] from researchers and savae it in a variable called researchers_cleaned
+    researchers_selected = researchers[["codigo_grupo", "nombre","categoria","posgrado", "fin vinculacion"]]
+    groups_instituciones = groups_raw[["Código del grupo", "instituciones"]]
+
+    #update the column "codigo del grupo" to "codigo_grupo" in groups_instituciones
+    groups_instituciones = groups_instituciones.rename(columns={"Código del grupo": "codigo_grupo"})
+
+    # Merge the dataframe "researchers_selected" with the dataframe "groups_instituciones" on the column "codigo_grupo"
+    researchers_selected = pd.merge(researchers_selected, groups_instituciones, on="codigo_grupo")
+
+    #drop duplicates from researchers_selected
+    researchers_selected = researchers_selected.drop_duplicates()
+
+    total_integrantes= researchers_selected.groupby(['codigo_grupo']).size().reset_index(name='cantidad_integrantes')
+
+    #update the value of the column "categoria" to null where column "categoria" is equal to "Investigador Jefferson Torres" of the dataframe "researchers_selected"
+    researchers_selected.loc[researchers_selected["categoria"] == "Investigador Jefferson Torres", "categoria"] = np.nan
+
+    #update the value of the column "categoria" to "Sin_categoria" where column "categoria" is equal to NaN"
+    researchers_selected["categoria"] = researchers_selected["categoria"].fillna("Sin_categoria")
+
+    categoriaXgrupo = pd.crosstab(researchers_selected["codigo_grupo"], researchers_selected["categoria"])
+    research_posgrado = pd.crosstab(researchers_selected["codigo_grupo"], researchers_selected["posgrado"])
+
+    categoria_posgrado_grupo = pd.merge(categoriaXgrupo, research_posgrado, on="codigo_grupo")
+
+    researchers_selected = pd.merge(researchers_selected, categoria_posgrado_grupo, on="codigo_grupo")
+
+    #delete columns "categoria", "posgrado" and "fin vinculacion" in researchers_selected
+    researchers_selected = researchers_selected.drop(columns=["nombre", "categoria", "fin vinculacion", "Técnico - nivel superior",
+    "Primaria","Primaria incompleta", "Secundario", "Técnico - nivel medio", "posgrado","No informado","Perfeccionamiento",
+    "Especialidad médica"])
+
+    researchers_selected = pd.merge(researchers_selected, total_integrantes, on="codigo_grupo")
+    
+    researchers_selected = researchers_selected.drop_duplicates()
+
+    #group by dataframe "researchers_selected"  by "instituciones" and count the values
+    researchers_selectedXInstitucion = researchers_selected.groupby("instituciones").sum()
+
+    return researchers_selectedXInstitucion
+
 
 
 

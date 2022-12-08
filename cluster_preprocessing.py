@@ -53,6 +53,11 @@ def preprocessing_groups_institutions(data):
     # Change the name of the column "Grupo reconocido" to "Group_no_category" in institutions_cleaned
     institutions_cleaned = institutions_cleaned.rename(columns={"Grupo reconocido": "Group_no_category"})
 
+    # Create a column named "instituciones" in the dataframe "institution_groups" with the values in index column
+    institutions_cleaned['instituciones'] = institutions_cleaned.index
+    # Move the column "instituciones" to the first position
+    institutions_cleaned = institutions_cleaned[['instituciones'] + [col for col in institutions_cleaned.columns if col != 'instituciones']]
+
     return institutions_cleaned
 
 # Create a function with the name "preprocessing_groups_papers" that receives the dataframe "papers_raw" and "groups_raw" as a parameters and run all the code above. Return the dataframe "institutions_papers_3"
@@ -81,9 +86,47 @@ def preprocessing_groups_papers(papers_raw, groups_raw):
     # Create a new column in the dataframe "institutions_papers_3" called "total" with the sum of the values of the dataframe "institutions_papers_3"
     institutions_papers_3["total"] = institutions_papers_3.sum(axis=1)
 
+    institutions_papers_3.columns = ['Paper_' + str(col) for col in institutions_papers_3.columns]
+
     return institutions_papers_3
 
+def preprocessing_groups_researchers(researchers_raw, groups_raw):
 
+    # from groups_raw dataframe, change the name of the column "Código del grupo" to "codigo_grupo", select "codigo_grupo" and "instituciones" and save the data in a variable called "groups_raw_1"
+    groups_raw_1 = groups_raw.rename(columns={'Código del grupo': 'codigo_grupo'})[['codigo_grupo', 'instituciones']]
 
+    # merge researchers_raw and groups_raw_1 on "codigo_grupo" and save the data in a variable called "researchers_raw_1"
+    researchers_raw_1 = researchers_raw.merge(groups_raw_1, on='codigo_grupo', how='left') # There is a mistake here
+
+    # create a new dataframe called "researchers_raw_2" from "researchers_raw_1" and select "Nombre" and "instituciones"
+    researchers_raw_2 = researchers_raw_1[['Nombre', 'instituciones']]
+
+    # Group the data by "instituciones" and count the number of values in column "Nombre", save the data in dataframe called "researchers_raw_3"
+    researchers_raw_3 = researchers_raw_2.groupby(['instituciones']).size().reset_index(name='counts')
+    # Change the name of the column "counts" to "researchers_total"
+    researchers_raw_total = researchers_raw_3.rename(columns={'counts': 'researchers_total'})
+
+    # form researchers_raw_1, select "Posgrado" and "instituciones" and save the data in a variable called "researchers_raw_4"
+    researchers_raw_4 = researchers_raw_1[['Posgrado', 'instituciones']]
+
+    # Change the values in "Posgrado", "Maestría/magister" or "Maestría/Magister" to "magister", "Doctorado" to "doctorate", "Especialización" to "specialization", "Especialidad médica" or "Especialidad Médica" to "medical_specialization", "Pregrado/universitario" or "Pregrado/Universitario" to "undergrad". Save the data in a variable called "researchers_raw_5" 
+    researchers_raw_5 = researchers_raw_4.replace({'Posgrado': {'Maestría/magister': 'magister', 'Maestría/Magister': 'magister', 'Doctorado': 'doctorate', 'Especialización': 'specialization', 'Especialidad médica': 'medical_specialization', 'Especialidad Médica': 'medical_specialization', 'Pregrado/universitario': 'undergrad', 'Pregrado/Universitario': 'undergrad'}})
+
+    # From researchers_raw_5, remove values in column "Posgrado" that are not in the list ["magister", "doctorate", "specialization", "medical_specialization", "undergrad"], save the data in a variable called "researchers_raw_5"
+    researchers_raw_5 = researchers_raw_5[researchers_raw_5['Posgrado'].isin(['magister', 'doctorate', 'specialization', 'medical_specialization', 'undergrad'])]
+
+    # From researchers_raw_5, group the data by "instituciones" and "Posgrado" and count the number of values in column "Posgrado", save the data in a variable called "researchers_raw_6"
+    researchers_raw_6 = researchers_raw_5.groupby(['instituciones', 'Posgrado']).size().reset_index(name='counts')
+
+    # Create a matrix with the values in column "Posgrado" as columns and the values in column "instituciones" as rows, save the data in a variable called "researchers_raw_7"
+    researchers_raw_7 = researchers_raw_6.pivot(index='instituciones', columns='Posgrado', values='counts')
+
+    # Fill the missing values with 0 and save the data in a variable called "researchers_raw_formation"
+    researchers_raw_formation = researchers_raw_7.fillna(0)
+
+    # Merge researchers_raw_formation and researchers_raw_total on "instituciones" and save the data in a variable called "researchers"
+    institutions_researchers = researchers_raw_formation.merge(researchers_raw_total, on='instituciones', how='left')
+
+    return institutions_researchers
 
 

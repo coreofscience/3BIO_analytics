@@ -13,9 +13,8 @@ https://drive.google.com/drive/u/1/folders/1nwv_jgXQhLbLJVh0dVgh9GSzV_VUj821
 ```{python}
 import pandas as pd
 # run file from the root of the project called "groups_preprocessing.py"
-%run groups_preprocessing.py
+%run cluster_preprocessing.py
 ```
-
 
 # Preprocessing Groups
 ```{python}
@@ -27,7 +26,6 @@ groups_raw = pd.read_csv(groups_url, encoding='utf-8')
 institution_groups = preprocessing_groups_institutions(groups_raw)
 del groups_url
 ```
-
 
 # Preprocessing products
 
@@ -42,8 +40,8 @@ del papers_url
 # Group by "codigo_grupo" and count the number of values in column "titulo", save the data in dataframe called "dummy"
 # institutions_papers = papers.groupby(['codigo_grupo']).size().reset_index(name='counts')
 # Run the function "preprocessing_groups_papers" on the variable "papers_raw" and "groups_raw", save the data in dataframe called "institutions_papers"
-institutions_papers = preprocessing_groups_papers(papers_raw, groups_raw)
-# papers_raw_1 = pd.read_csv('articulos_publindex_scimago.csv', sep=";")
+# papers_raw = pd.read_csv('articulos_publindex_scimago.csv', sep=";")
+institution_papers = preprocessing_groups_papers(papers_raw, groups_raw)
 ```
 
 # Preprocessing researchers
@@ -53,89 +51,13 @@ institutions_papers = preprocessing_groups_papers(papers_raw, groups_raw)
 researchers_url = "https://drive.google.com/file/d/1FVOasDcWgGBX41_6mGyt3LudneR29hfj/view?usp=share_link"
 researchers_url = 'https://drive.google.com/uc?id=' + researchers_url.split('/')[-2]
 researchers_raw = pd.read_csv(researchers_url, sep=';')
+del researchers_url
+institution_researcher = preprocessing_groups_researchers(researchers_raw, groups_raw)
 ```
+
+# Merging all datasets
 
 ```{python}
-# from groups_raw dataframe, change the name of the column "Código del grupo" to "codigo_grupo", select "codigo_grupo" and "instituciones" and save the data in a variable called "groups_raw_1"
-groups_raw_1 = groups_raw.rename(columns={'Código del grupo': 'codigo_grupo'})[['codigo_grupo', 'instituciones']]
-
-# merge researchers_raw and groups_raw_1 on "codigo_grupo" and save the data in a variable called "researchers_raw_1"
-researchers_raw_1 = researchers_raw.merge(groups_raw_1, on='codigo_grupo', how='left') # There is a mistake here
-
-# create a new dataframe called "researchers_raw_2" from "researchers_raw_1" and select "Nombre" and "instituciones"
-researchers_raw_2 = researchers_raw_1[['Nombre', 'instituciones']]
-
-# Group the data by "instituciones" and count the number of values in column "Nombre", save the data in dataframe called "researchers_raw_3"
-researchers_raw_3 = researchers_raw_2.groupby(['instituciones']).size().reset_index(name='counts')
-# Change the name of the column "counts" to "researchers_total"
-researchers_raw_3 = researchers_raw_3.rename(columns={'counts': 'researchers_total'})
+# Merge the dataframes "institution_groups", "institution_papers" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"
+institution_data = pd.merge(institution_groups, institution_papers, on='instituciones')
 ```
-
-```{python}
-# form researchers_raw_1, select "Posgrado" and "instituciones" and save the data in a variable called "researchers_raw_4"
-researchers_raw_4 = researchers_raw_1[['Posgrado', 'instituciones']]
-
-# Count the unique values in column "Posgrado" and save the data in a variable called "dummy"
-dummy = researchers_raw_4['Posgrado'].value_counts() # There is a mistake here
-
-# Create a matrix with the count of values in column "Posgrado" and "instituciones", save the data in a variable called "researchers_raw_5"
-researchers_raw_5 = pd.crosstab(researchers_raw_4['Posgrado'], researchers_raw_4['instituciones'])
-```
-
-```{python}
-researchers_institutions = researchers_raw.merge(groups_raw_1, on='codigo_grupo', how='left')
-```
-
-```{python}
-
-
-dummy_1= researchers.groupby(['codigo_grupo']).size().reset_index(name='counts')
-
-researchers_institutions = groups_raw[['codigo del grupo', 'instituciones']].merge(dummy_1, left_on='codigo del grupo', right_on= 'codigo_grupo', how='left')
-```
-
-
-```{python}
-# create a variable called "researchers_raw" from the url "https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0"
-researchers = "https://drive.google.com/file/d/143u1k6A-LZDhhSGvREzNaXYT4aUEZlGN/view?usp=share_link"
-researchers = 'https://drive.google.com/uc?id=' + researchers.split('/')[-2]
-researchers = pd.read_csv("https://docs.google.com/spreadsheets/d/1jNY8oEnunCXo80_BWsRtl2ejN6CQstWgs4quDNQpE8Y/export?format=csv&gid=0")
-```
-
-How many instituciones do we have in reserachers?
-```{python}
-# group the variable "instituciones" in researchers and count the number of rows in each group and sort them in descending order and save the result in a variable called "researchers_institutions"
-researchers_institutions = researchers_raw.groupby("instituciones").size().sort_values(ascending=False)
-```
-
-
-
-```{python}
-
-```
-
-
-## Reading data from papers
-```{python}
-url='https://drive.google.com/file/d/1KrG-06OFCusN2JpgaqtaC4dl6sCpVaaX/view?usp=share_link'
-url='https://drive.google.com/uc?id=' + url.split('/')[-2]
-papers = pd.read_csv(url)
-```
-
-```{python}
-# Show me the first ten row of papers dataframe
-papers.head(10)
-```
-
-```{python}
-integrantes='https://drive.google.com/file/d/143u1k6A-LZDhhSGvREzNaXYT4aUEZlGN/view?usp=share_link'
-integrantes='https://drive.google.com/uc?id=' + integrantes.split('/')[-2]
-integrantes = pd.read_csv(integrantes)
-```
-
-```{python}
-# read the data from this url "https://docs.google.com/spreadsheets/d/1xmA2VoQt3-cOC2b2-s3JQqt28XkS2Uz7erI2lriC-ys/export?format=csv&gid=1353066533" and remove the first row
-resumen = pd.read_csv("https://docs.google.com/spreadsheets/d/1xmA2VoQt3-cOC2b2-s3JQqt28XkS2Uz7erI2lriC-ys/export?format=csv&gid=1353066533", skiprows=1)
-```
-
-

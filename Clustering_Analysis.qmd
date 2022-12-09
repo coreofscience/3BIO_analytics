@@ -1,0 +1,44 @@
+---
+title: Cluster Analysis
+author: Sebastian Robledo
+date: "Nov 20, 2022"
+format:
+    html:   
+        code-fold: true
+---
+
+# Loading python libraries
+
+```{python}
+# Load the "pandas" library as "pd"
+import pandas as pd
+# Load the "cluster" library
+import cluster
+# Load the "stats" library
+import stats
+```
+
+```{python}
+# install the "cluster" 
+```
+
+##Data loading
+
+```{python}
+# Perform clustering analysis with python library "cluster" on cluster_data 
+# Read the data from the Google Sheet
+cluster_data = pd.read_csv("https://docs.google.com/spreadsheets/d/1SxlV8oasFsBP8KbBuyomyCJyaS3b3Z78yDxNPHSqRMY/export?format=csv&gid=1099331023")
+```
+
+
+# Clustering Analysis
+
+Clustering analysis
+
+```{python}
+# Perform a clustering analysis on cluster_data 
+cluster.cluster(cluster_data)
+```
+
+
+

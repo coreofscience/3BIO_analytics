@@ -12,6 +12,7 @@ https://drive.google.com/drive/u/1/folders/1nwv_jgXQhLbLJVh0dVgh9GSzV_VUj821
 
 ```{python}
 import pandas as pd
+import gdown
 # run file from the root of the project called "groups_preprocessing.py"
 %run cluster_preprocessing.py
 ```
@@ -32,15 +33,11 @@ del groups_url
 ## Papers
 
 ```{python}
-# create a variable called "groups_raw" from the url "https://drive.google.com/file/d/1kUZtJz_tJkKzhwtHcRWjHfbYv_3wTZUK/view?usp=share_link"
 papers_url = "https://drive.google.com/file/d/1kUZtJz_tJkKzhwtHcRWjHfbYv_3wTZUK/view?usp=share_link"
 papers_url = 'https://drive.google.com/uc?id=' + papers_url.split('/')[-2]
-papers_raw = pd.read_csv(papers_url, sep=';')
-del papers_url
-# Group by "codigo_grupo" and count the number of values in column "titulo", save the data in dataframe called "dummy"
-# institutions_papers = papers.groupby(['codigo_grupo']).size().reset_index(name='counts')
-# Run the function "preprocessing_groups_papers" on the variable "papers_raw" and "groups_raw", save the data in dataframe called "institutions_papers"
-# papers_raw = pd.read_csv('articulos_publindex_scimago.csv', sep=";")
+output = "articulos_publindex_scimago.csv"
+gdown.download(papers_url, output, quiet=False)
+papers_raw = pd.read_csv('articulos_publindex_scimago.csv', sep=";")
 institution_papers = preprocessing_groups_papers(papers_raw, groups_raw)
 ```
 

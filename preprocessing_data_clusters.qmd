@@ -39,6 +39,8 @@ output = "articulos_publindex_scimago.csv"
 gdown.download(papers_url, output, quiet=False)
 papers_raw = pd.read_csv('articulos_publindex_scimago.csv', sep=";")
 institution_papers = preprocessing_groups_papers(papers_raw, groups_raw)
+del papers_url
+del output 
 ```
 
 # Preprocessing researchers

@@ -58,6 +58,8 @@ institution_researcher = preprocessing_groups_researchers(researchers_raw, group
 # Merging all datasets
 
 ```{python}
-# Merge the dataframes "institution_groups", "institution_papers" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"
+# Merge the dataframes "institution_groups", "institution_papers" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"    
 institution_data = pd.merge(institution_groups, institution_papers, on='instituciones')
+institution_data = pd.merge(institution_data, institution_researcher, on='instituciones')
 ```
+

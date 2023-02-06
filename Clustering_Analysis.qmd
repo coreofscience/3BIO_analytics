@@ -5,6 +5,8 @@ date: "Nov 20, 2022"
 format:
     html:   
         code-fold: true
+editor:
+  render-on-save: true
 ---
 
 # Loading python libraries
@@ -13,13 +15,9 @@ format:
 # Load the "pandas" library as "pd"
 import pandas as pd
 # Load the "cluster" library
-import cluster
+from sklearn.cluster import KMeans
 # Load the "stats" library
-import stats
-```
-
-```{python}
-# install the "cluster" 
+import numpy as np
 ```
 
 ##Data loading
@@ -27,18 +25,85 @@ import stats
 ```{python}
 # Perform clustering analysis with python library "cluster" on cluster_data 
 # Read the data from the Google Sheet
-cluster_data = pd.read_csv("https://docs.google.com/spreadsheets/d/1SxlV8oasFsBP8KbBuyomyCJyaS3b3Z78yDxNPHSqRMY/export?format=csv&gid=1099331023")
+cluster_data_inst = pd.read_csv("https://docs.google.com/spreadsheets/d/1SxlV8oasFsBP8KbBuyomyCJyaS3b3Z78yDxNPHSqRMY/export?format=csv&gid=1099331023")
+
+# Remove column "instituciones" from cluster_data
+cluster_data = cluster_data_inst.drop("instituciones", axis=1)
+```
+
+## Data cleaning
+
+```{python}
+# Normalize the data in cluster_data
+def divi(x):
+    const = x.iloc[1]
+    if const == 0:
+        const=1
+    df = x.iloc[3:]
+    df_n = df.div(const)
+    return df_n
+
+cluster_data_nor = cluster_data.apply(divi, axis=1)  
+# cluster_data_nor['instituciones']= cluster_data_inst['instituciones']
+
+# Scale the data in cluster_data to be between 0 and 1 
+cluster_data_sc = (cluster_data - cluster_data.min()) / (cluster_data.max() - cluster_data.min())
+
+# Center the data in cluster_sc by subtracting the mean of each column from each column 
+cluster_data_sc_cent = cluster_data_sc - cluster_data_sc.mean()
+
+# Divide the data in cluster_data by the value in the column "researchers_total" 
+cluster_data_nor_res = cluster_data.div(cluster_data["researchers_total"], axis=0)
+
+# Remove researchers_total from cluster_data_nor_res
+cluster_data_nor_res = cluster_data_nor_res.drop("researchers_total", axis=1)
+
+# Scale the data in cluster_data_nor_res to be between 0 and 1 
+cluster_data_nor_res_sc = (cluster_data_nor_res - cluster_data_nor_res.min()) / (cluster_data_nor_res.max() - cluster_data_nor_res.min())
+
+# Center the data in cluster_data_nor_res_sc by subtracting the mean of each column from each column 
+cluster_data_nor_res_sc_cent = cluster_data_nor_res_sc - cluster_data_nor_res_sc.mean()
 ```
 
 
-# Clustering Analysis
+# insert python chunck 
+
+
+
+
+
+Tipo de programa? - 
+añadir los tipos de productos (libros, innovaciones, software)
+
+https://drive.google.com/drive/u/1/folders/1Vh-72HiNoVF6oDlDpgwv_U32RSV22i0h  
+
+
+# Clustering Analysis with k-means
 
 Clustering analysis
 
 ```{python}
-# Perform a clustering analysis on cluster_data 
-cluster.cluster(cluster_data)
+# Number of clusters
+k = 10
+
+# Create KMeans model
+kmeans = KMeans(n_clusters=k)
+
+# Fit the model to the data
+kmeans.fit(cluster_data_nor_res_sc_cent)
+
+# Get cluster labels
+labels = kmeans.labels_
+
+# Get cluster centers
+cluster_centers = kmeans.cluster_centers_
+
+# Add labels to cluster_data as a new column "Cluster" 
+cluster_data_nor_res_sc_cent["Cluster"] = labels
+
+# Add "instituciones" to cluster_data_nor as a new column "instituciones" from cluster_data_inst
+cluster_data_nor_res_sc_cent["instituciones"] = cluster_data_inst["instituciones"]
+
+# Count the unique values in column "Cluster"
+cluster_data_nor_res_sc_cent["Cluster"].value_counts()
 ```
-
-
-

@@ -84,7 +84,7 @@ Clustering analysis
 
 ```{python}
 # Number of clusters
-k = 10
+k = 5
 
 # Create KMeans model
 kmeans = KMeans(n_clusters=k)

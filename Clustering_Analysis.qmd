@@ -31,6 +31,104 @@ cluster_data_inst = pd.read_csv("https://docs.google.com/spreadsheets/d/1SxlV8oa
 cluster_data = cluster_data_inst.drop("instituciones", axis=1)
 ```
 
+# Vivi analysis 
+
+```{python}
+# add a column to cluster_data named "tiempo". Tiempo is the time in years minus column "anio" 
+cluster_data["tiempo"] = 2022 - cluster_data["anio"]
+
+# create a new column "Group_A_time" in cluster_data. Group_A_time is the value in column "Group_A" divided by the value in column "tiempo"
+cluster_data["Group_A_time"] = cluster_data["Group_A"] / cluster_data["tiempo"]
+
+# create a new column "Group_B_time" in cluster_data. Group_B_time is the value in column "Group_B" divided by the value in column "tiempo"
+cluster_data["Group_B_time"] = cluster_data["Group_B"] / cluster_data["tiempo"]
+
+# create a new column "Group_C_time" in cluster_data. Group_C_time is the value in column "Group_C" divided by the value in column "tiempo"
+cluster_data["Group_C_time"] = cluster_data["Group_C"] / cluster_data["tiempo"]
+
+# create a new column "Group_no_category_time" in cluster_data. Group_no_category is the value in column "Group_no_category" divided by the value in column "tiempo"
+cluster_data["Group_no_category_time"] = cluster_data["Group_no_category"] / cluster_data["tiempo"]
+
+# Create a new column "Paper_A1_time" in cluster_data. Paper_A1_time is the value in column "Paper_A1" divided by the value in column "tiempo"
+cluster_data["Paper_A1_time"] = cluster_data["Paper_A1"] / cluster_data["tiempo"]
+
+# Create a new column "Paper_A2_time" in cluster_data. Paper_A2_time is the value in column "Paper_A2" divided by the value in column "tiempo"
+cluster_data["Paper_A2_time"] = cluster_data["Paper_A2"] / cluster_data["tiempo"]
+
+# Create a new column "Paper_B_time" in cluster_data. Paper_B_time is the value in column "Paper_B" divided by the value in column "tiempo"
+cluster_data["Paper_B_time"] = cluster_data["Paper_B"] / cluster_data["tiempo"]
+
+# Create a new column "Paper_C_time" in cluster_data. Paper_C_time is the value in column "Paper_C" divided by the value in column "tiempo"
+cluster_data["Paper_C_time"] = cluster_data["Paper_C"] / cluster_data["tiempo"]
+
+# Create a new column "Paper_no_category_time" in cluster_data. Paper_no_category_time is the value in column "Paper_Sin_category" divided by the value in column "tiempo"
+cluster_data["Paper_no_category_time"] = cluster_data["Paper_Sin_categoria"] / cluster_data["tiempo"]
+
+# Create a new column "doctorate_time" in cluster_data. doctorate is the value in column "doctorate" divided by the value in column "total"
+cluster_data["doctorate"] = cluster_data["doctorate"] / cluster_data["researchers_total"]
+
+# Create a new column "magister_time" in cluster_data. magister is the value in column "magister" divided by the value in column "total"
+cluster_data["magister"] = cluster_data["magister"] / cluster_data["researchers_total"]
+
+# Create a new column "medical_specialization_time" in cluster_data. medical_specialization is the value in column "medical_specialization" divided by the value in column "total"
+cluster_data["medical_specialization"] = cluster_data["medical_specialization"] / cluster_data["researchers_total"]
+
+# Create a new column "undergrad_time" in cluster_data. undergrad is the value in column "undergrad" divided by the value in column "tiempo"
+cluster_data["undergrad"] = cluster_data["undergrad"] / cluster_data["researchers_total"]
+
+# Select from cluster_data the columns "Group_A_time", "Group_B_time", "Group_C_time", "Group_no_category_time", "Paper_A1_time", "Paper_A2_time", "Paper_B_time", "Paper_C_time", "Paper_no_category_time" and "doctorate_time", "magister_time", "medical_specialization_time" and "undergrad_time" and save the result in cluster_data_vivi
+cluster_data_vivi = cluster_data[["Group_A_time", "Group_B_time", "Group_C_time", "Group_no_category_time", "Paper_A1_time", "Paper_A2_time", "Paper_B_time", "Paper_C_time","doctorate", "magister", "medical_specialization", "undergrad"]]
+```
+
+# Centralization and scaling
+```{python}
+# Center the data in cluster_data_vivi
+cluster_data_vivi = cluster_data_vivi - cluster_data_vivi.mean()
+```
+
+```{python}
+# Pareto scale the data in cluster_data_vivi
+cluster_data_vivi_sc = cluster_data_vivi / cluster_data_vivi.std()
+```
+
+# Clustering hierarchical
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# Perform the linkage
+Z = linkage(cluster_data_vivi_sc, 'ward')
+
+# Plot the dendrogram
+dendrogram(Z)
+plt.show()
+
+```
+
+# Clustering kmeans
+
+```{python}
+# Perform clustering analysis with python library "cluster" on cluster_data_vivi_sc
+# Create a KMeans object with 3 clusters
+kmeans = KMeans(n_clusters=5)
+# Fit the data to the KMeans object
+kmeans.fit(cluster_data_vivi_sc)
+# Get the cluster labels
+labels = kmeans.predict(cluster_data_vivi_sc)
+# Create a new column in cluster_data_vivi_sc named "cluster" with the cluster labels
+cluster_data_vivi_sc["cluster"] = labels
+
+# Count unique values in column "cluster" of cluster_data_vivi_sc
+cluster_data_vivi_sc["cluster"].value_counts()
+
+# Add column "instituciones" from cluster_data_inst to cluster_data_vivi_sc
+cluster_data_vivi_sc["instituciones"] = cluster_data_inst["instituciones"]
+```
+
+
+
 ## Data cleaning
 
 ```{python}
@@ -106,4 +204,10 @@ cluster_data_nor_res_sc_cent["instituciones"] = cluster_data_inst["instituciones
 
 # Count the unique values in column "Cluster"
 cluster_data_nor_res_sc_cent["Cluster"].value_counts()
+```
+
+
+
+```{python}
+
 ```

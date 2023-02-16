@@ -31,6 +31,77 @@ cluster_data_inst = pd.read_csv("https://docs.google.com/spreadsheets/d/1SxlV8oa
 cluster_data = cluster_data_inst.drop("instituciones", axis=1)
 ```
 
+# Sebas analysis
+
+```{python}
+# Divide the values in the columns "Paper_A1", "Paper_A2", "Paper_B", "Paper_C", "Paper_Sin_categoria" by the values in the column "researchers_total" and save the result in the columns "Paper_A1_res_total", "Paper_A2_res_total", "Paper_B_res_total", "Paper_C_res_total", "Paper_Sin_categoria_res_total"
+paper_categories = ["Paper_A1", "Paper_A2", "Paper_B", "Paper_C", "Paper_Sin_categoria"]
+for category in paper_categories:
+    cluster_data[f"{category}_res_total"] = cluster_data[category] / cluster_data["researchers_total"]
+```
+## Centralization and scaling
+```{python}
+# Center the data in cluster_data in all columns with names finishing in "_res_total" and save the result in cluster_data_sebas
+cluster_data_sebas = cluster_data[[col for col in cluster_data.columns if col.endswith("_res_total")]] - cluster_data[[col for col in cluster_data.columns if col.endswith("_res_total")]].mean()
+```
+
+```{python}
+# Pareto scale the data in cluster_data_sebas and save the result in cluster_data_sebas_sc
+cluster_data_sebas_sc = cluster_data_sebas / cluster_data_sebas.std()
+```
+
+## Clustering hierarchical
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# Perform the linkage
+Z = linkage(cluster_data_sebas_sc, 'ward')
+
+# Plot the dendrogram
+dendrogram(Z)
+plt.show()
+
+```
+
+## Clustering kmeans
+
+```{python}
+# Perform clustering analysis with python library "cluster" on cluster_data_vivi_sc
+# Create a KMeans object with 3 clusters
+kmeans = KMeans(n_clusters=5)
+# Fit the data to the KMeans object
+kmeans.fit(cluster_data_sebas_sc)
+# Get the cluster labels
+labels = kmeans.predict(cluster_data_sebas_sc)
+# Create a new column in cluster_data_vivi_sc named "cluster" with the cluster labels
+cluster_data_sebas_sc["cluster"] = labels
+
+# Count unique values in column "cluster" of cluster_data_vivi_sc
+cluster_data_sebas_sc["cluster"].value_counts()
+
+# Add column "instituciones" from cluster_data_inst to cluster_data_vivi_sc
+cluster_data_sebas_sc["instituciones"] = cluster_data_inst["instituciones"]
+```
+
+```{python}
+# Print the size of each cluster in cluster_data_vivi_sc 
+for i in range(0,5):
+    print("Cluster", i, "size:", cluster_data_sebas_sc[cluster_data_sebas_sc["cluster"] == i].shape[0])
+```
+
+```{python}
+# Create a list with the names of the columns to be scaled in cluster_data_sebas_sc
+scaled_features = [col for col in cluster_data_sebas_sc.columns if col.endswith("_res_total")]
+
+# Plot cluster centers to visualize the clusters
+cluster_data_sebas_sc.groupby('cluster')[scaled_features].mean().plot(legend=True, kind='bar')
+plt.show()
+```
+
+
 # Vivi analysis 
 
 ```{python}
@@ -80,7 +151,7 @@ cluster_data["undergrad"] = cluster_data["undergrad"] / cluster_data["researcher
 cluster_data_vivi = cluster_data[["Group_A_time", "Group_B_time", "Group_C_time", "Group_no_category_time", "Paper_A1_time", "Paper_A2_time", "Paper_B_time", "Paper_C_time","doctorate", "magister", "medical_specialization", "undergrad"]]
 ```
 
-# Centralization and scaling
+## Centralization and scaling
 ```{python}
 # Center the data in cluster_data_vivi
 cluster_data_vivi = cluster_data_vivi - cluster_data_vivi.mean()
@@ -91,7 +162,7 @@ cluster_data_vivi = cluster_data_vivi - cluster_data_vivi.mean()
 cluster_data_vivi_sc = cluster_data_vivi / cluster_data_vivi.std()
 ```
 
-# Clustering hierarchical
+## Clustering hierarchical
 
 ```{python}
 import numpy as np
@@ -107,7 +178,7 @@ plt.show()
 
 ```
 
-# Clustering kmeans
+## Clustering kmeans
 
 ```{python}
 # Perform clustering analysis with python library "cluster" on cluster_data_vivi_sc
@@ -127,9 +198,22 @@ cluster_data_vivi_sc["cluster"].value_counts()
 cluster_data_vivi_sc["instituciones"] = cluster_data_inst["instituciones"]
 ```
 
+```{python}
+# Print the size of each cluster in cluster_data_vivi_sc 
+for i in range(0,5):
+    print("Cluster", i, "size:", cluster_data_vivi_sc[cluster_data_vivi_sc["cluster"] == i].shape[0])
+```
 
+```{python}
+# Create a list with the names of the columns to be scaled in cluster_data_vivi_sc 
+scaled_features = ["Group_A_time", "Group_B_time", "Group_C_time", "Group_no_category_time", "Paper_A1_time", "Paper_A2_time", "Paper_B_time", "Paper_C_time", "doctorate", "magister", "medical_specialization", "undergrad"]
 
-## Data cleaning
+# Plot cluster centers to visualize the clusters
+cluster_data_vivi_sc.groupby('cluster')[scaled_features].mean().plot(legend=True, kind='bar')
+plt.show()
+```
+
+# Data cleaning
 
 ```{python}
 # Normalize the data in cluster_data
@@ -209,5 +293,7 @@ cluster_data_nor_res_sc_cent["Cluster"].value_counts()
 
 
 ```{python}
-
+# Crea un dataframe con datos simulados de ventas de un producto en 3 tiendas (A, B y C) en 4 días (L, M, X y J) 
+# y con 3 categorías de producto (A, B y C)
+data = pd.DataFrame({'A': [1, 2, 3, 4], 'B': [5, 6, 7, 8], 'C': [9, 10, 11, 12]}, index=['L', 'M', 'X', 'J'])
 ```

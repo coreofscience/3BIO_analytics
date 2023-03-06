@@ -187,3 +187,53 @@ def preprocessing_groups_researchers(researchers_raw, groups_raw):
     institutions_researchers = researchers_raw_formation.merge(researchers_raw_total, on='instituciones', how='left')
 
     return institutions_researchers
+
+# create a function called "preprocessing_groups_capitulos" with the code below
+def preprocessing_groups_capitulos(groups_raw, capitulos_grouped):
+    """This module provides functions for preprocessing data for chapters."""
+    # create a dataframe called capitulos_grouped with the following columns:
+    # - "codigo_grupo" (from "capitulos_raw") 
+    # - "capitulos_totales" (the number of rows in "capitulos_raw" for each "codigo_grupo")
+    capitulos_grouped = capitulos_raw.groupby('codigo_grupo').size().reset_index(name='capitulos_totales')
+    # from the dataframe "groups_raw" select the columns
+    # "Código del grupo" and "instituciones" and save it in a
+    # dataframe called "institutions_groups_names", also change
+    # the column name to "codigo_grupo" and "instituciones"
+    institutions_groups_names = groups_raw[["Código del grupo", "instituciones"]]
+    institutions_groups_names.columns = ["codigo_grupo", "instituciones"]
+    # from the dataframe "institutions_groups_names" filter the
+    # unique values and save the results in a dataframe called
+    # "institutions_groups_names_unique"
+    institutions_groups_names_unique = institutions_groups_names.drop_duplicates(subset=['codigo_grupo'])
+    # Merge the dataframe "institutions_groups_names" with the
+    # dataframe "caplitulos_grouped" on the column "codigo_grupo"
+    institutions_capitulos = pd.merge(institutions_groups_names_unique,
+                                        capitulos_grouped, on="codigo_grupo")
+    # Remove the column "codigo_grupo" from the dataframe "institutions_papers_2"
+    institutions_capitulos_1 = institutions_capitulos.drop(columns=["codigo_grupo"])
+    # Create a dataframe called "institutions_capitulos_2"
+    # with the group by of the dataframe "institutions_capitulos_1"
+    # by the column "instituciones" and sum the values
+    institutions_capitulos_2 = institutions_capitulos_1.groupby(["instituciones"]).sum()    
+    # from the dataframe "groups_raw" select the columns
+    # "Código del grupo" and "instituciones" and save it in a
+    # dataframe called "institutions_groups_names", also change
+    # the column name to "codigo_grupo" and "instituciones"
+    institutions_groups_names = groups_raw[["Código del grupo", "instituciones"]]
+    institutions_groups_names.columns = ["codigo_grupo", "instituciones"]
+    # from the dataframe "institutions_groups_names" filter the
+    # unique values and save the results in a dataframe called
+    # "institutions_groups_names_unique"
+    institutions_groups_names_unique = institutions_groups_names.drop_duplicates(subset=['codigo_grupo'])
+    # Merge the dataframe "institutions_groups_names" with the
+    # dataframe "caplitulos_grouped" on the column "codigo_grupo"
+    institutions_capitulos = pd.merge(institutions_groups_names_unique,
+                                    capitulos_grouped, on="codigo_grupo")
+    # Remove the column "codigo_grupo" from the dataframe "institutions_papers_2"
+    institutions_capitulos_1 = institutions_capitulos.drop(columns=["codigo_grupo"])
+    # Create a dataframe called "institutions_capitulos_2"
+    # with the group by of the dataframe "institutions_capitulos_1"
+    # by the column "instituciones" and sum the values
+    institutions_capitulos_2 = institutions_capitulos_1.groupby(["instituciones"]).sum()
+
+    return institutions_capitulos_2

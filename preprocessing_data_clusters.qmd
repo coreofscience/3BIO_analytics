@@ -28,6 +28,17 @@ institution_groups = preprocessing_groups_institutions(groups_raw)
 del groups_url
 ```
 
+# Preprocessing chapters
+
+```{python}
+# create a variable called "capitulos_raw" from the url "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
+capitulos_url = "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
+capitulos_url = 'https://drive.google.com/uc?id=' + capitulos_url.split('/')[-2]
+capitulos_raw = pd.read_csv(capitulos_url, sep=';')
+del capitulos_url
+institution_chapters = preprocessing_groups_capitulos(groups_raw, capitulos_raw)
+```
+
 # Preprocessing products
 
 ## Papers
@@ -57,8 +68,9 @@ institution_researcher = preprocessing_groups_researchers(researchers_raw, group
 # Merging all datasets
 
 ```{python}
-# Merge the dataframes "institution_groups", "institution_papers" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"    
-institution_data = pd.merge(institution_groups, institution_papers, on='instituciones')
-institution_data = pd.merge(institution_data, institution_researcher, on='instituciones')
+# Merge the dataframes "institution_groups", "institution_papers", "institutions_chapters" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"    
+institution_data = pd.merge(institution_groups, institution_papers, on='instituciones', how='outer')
+institution_data = pd.merge(institution_data, institution_chapters, on='instituciones', how='outer')
+institution_data = pd.merge(institution_data, institution_researcher, on='instituciones', how='outer')
 ```
 

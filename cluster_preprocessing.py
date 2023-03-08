@@ -265,3 +265,33 @@ def preprocessing_groups_innovations(groups_raw, innovations_raw):
     institutions_innovations_2 = institutions_innovations_1.groupby(["instituciones"]).sum()   
 
     return institutions_innovations_2 
+
+def preprocessing_groups_books(groups_raw, books_raw):
+    # create a dataframe called capitulos_grouped with the following columns:
+    # - "codigo_grupo" (from "capitulos_raw") 
+    # - "innovations_totals" (the number of rows in "innovations_raw" for each "codigo_grupo")
+    institutions_grouped = groups_raw.groupby('Código del grupo').size().reset_index(name='institutions_totals')
+    # change the column name "grupo" to "codigo_grupo"
+    institutions_grouped.columns = ["codigo_grupo", "institutions_totals"]
+    # from the dataframe "groups_raw" select the columns
+    # "Código del grupo" and "instituciones" and save it in a
+    # dataframe called "institutions_groups_names", also change
+    # the column name to "codigo_grupo" and "instituciones"
+    institutions_groups_names = groups_raw[["Código del grupo", "instituciones"]]
+    institutions_groups_names.columns = ["codigo_grupo", "instituciones"]
+    # from the dataframe "institutions_groups_names" filter the
+    # unique values and save the results in a dataframe called
+    # "institutions_groups_names_unique"
+    institutions_groups_names_unique = institutions_groups_names.drop_duplicates(subset=['codigo_grupo'])
+    # # # Merge the dataframe "institutions_groups_names" with the
+    # # # dataframe "caplitulos_grouped" on the column "codigo_grupo"
+    institutions_groups = pd.merge(institutions_groups_names_unique,
+                                   institutions_grouped, on="codigo_grupo")
+    # Remove the column "codigo_grupo" from the dataframe "institutions_papers_2"
+    institutions_groups_1 = institutions_groups.drop(columns=["codigo_grupo"])
+    # Create a dataframe called "institutions_capitulos_2"
+    # with the group by of the dataframe "institutions_capitulos_1"
+    # by the column "instituciones" and sum the values
+    institutions_groups_2 = institutions_groups_1.groupby(["instituciones"]).sum()   
+    
+    return institutions_groups_2

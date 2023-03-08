@@ -87,6 +87,19 @@ del softwares_url
 institution_softwares = preprocessing_groups_softwares(groups_raw, softwares_raw)
 ```
 
+## Thesis
+
+```{python}
+thesis_url = "https://drive.google.com/file/d/1wdjYQ4_NSLvXJEqzabUhFzzHlWBf43Zk/view?usp=sharing"
+thesis_url = 'https://drive.google.com/uc?id=' + thesis_url.split('/')[-2]
+output = "thesis.csv"
+gdown.download(thesis_url, output, quiet=False)
+thesis_raw = pd.read_csv('thesis.csv')
+institution_thesis = preprocessing_groups_thesis(groups_raw, thesis_raw)
+del thesis_url
+del output 
+```
+
 # Preprocessing researchers
 
 ```{python}
@@ -119,11 +132,15 @@ institution_data = pd.merge(institution_data,
                             on='instituciones', 
                             how='outer')
 institution_data = pd.merge(institution_data, 
-                            institution_researcher, 
+                            institution_softwares, 
                             on='instituciones', 
                             how='outer')
 institution_data = pd.merge(institution_data, 
-                            institution_softwares, 
+                            institution_thesis, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_researcher, 
                             on='instituciones', 
                             how='outer')
 ```

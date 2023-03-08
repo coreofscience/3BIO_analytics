@@ -19,24 +19,13 @@ import gdown
 
 # Preprocessing Groups
 ```{python}
-# create a variable called "groups_raw" from the url "https://drive.google.com/file/d/1Ath8osa-9K4jDhrP5_qZ78AT5UwV79hC/view?usp=share_link""
+# create a variable called "groups_raw" from the url "https://drive.google.com/drive/u/1/folders/1gBsinvzPKDOfBhYwpyGRkqFY6q-LCaYi""
 groups_url = "https://drive.google.com/file/d/1S5Hdhx4aL2MbtxKF6h1TbYd3lg3WZA7j/view?usp=share_link"
 groups_url = 'https://drive.google.com/uc?id=' + groups_url.split('/')[-2]
 groups_raw = pd.read_csv(groups_url, encoding='utf-8')
 # Run the function "preprocess_groups" on the variable "groups_raw"
 institution_groups = preprocessing_groups_institutions(groups_raw)
 del groups_url
-```
-
-# Preprocessing chapters
-
-```{python}
-# create a variable called "capitulos_raw" from the url "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
-capitulos_url = "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
-capitulos_url = 'https://drive.google.com/uc?id=' + capitulos_url.split('/')[-2]
-capitulos_raw = pd.read_csv(capitulos_url, sep=';')
-del capitulos_url
-institution_chapters = preprocessing_groups_capitulos(groups_raw, capitulos_raw)
 ```
 
 # Preprocessing products
@@ -54,6 +43,50 @@ del papers_url
 del output 
 ```
 
+## chapters
+
+```{python}
+# create a variable called "capitulos_raw" from the url "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
+capitulos_url = "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
+capitulos_url = 'https://drive.google.com/uc?id=' + capitulos_url.split('/')[-2]
+capitulos_raw = pd.read_csv(capitulos_url, sep=';')
+del capitulos_url
+institution_chapters = preprocessing_groups_capitulos(groups_raw, capitulos_raw)
+```
+
+## Innovations
+
+```{python}
+# create a variable called "capitulos_raw" from the url "https://drive.google.com/file/d/1YhtuesiVtpOTtZP9p1noZ-eOfcLuc_3G/view?usp=share_link"
+innovations_url = "https://drive.google.com/file/d/1g13GEnBqF7NhedB1DWeUSKdCPlH62-1i/view?usp=sharing"
+innovations_url = 'https://drive.google.com/uc?id=' + innovations_url.split('/')[-2]
+innovations_raw = pd.read_csv(innovations_url, sep=';')
+del innovations_url
+institution_innovations = preprocessing_groups_innovations(groups_raw, innovations_raw)
+```
+
+## Books
+
+```{python}
+# create a variable called "books_raw" from the url "https://drive.google.com/file/d/1JZyokRCDKCOptr_mVV-YE3NoyMJCRafN/view?usp=sharing"
+books_url = "https://drive.google.com/file/d/1JZyokRCDKCOptr_mVV-YE3NoyMJCRafN/view?usp=sharing"
+books_url = 'https://drive.google.com/uc?id=' + books_url.split('/')[-2]
+books_raw = pd.read_csv(books_url)
+del books_url
+institution_books = preprocessing_groups_books(groups_raw, books_raw)
+```
+
+## Softwares
+
+```{python}
+# create a variable called "books_raw" from the url "https://drive.google.com/file/d/1JZyokRCDKCOptr_mVV-YE3NoyMJCRafN/view?usp=sharing"
+softwares_url = "https://drive.google.com/file/d/16Yc3d65u8-bMWVMw1xSy0mZdi13TkZN-/view?usp=sharing"
+softwares_url = 'https://drive.google.com/uc?id=' + softwares_url.split('/')[-2]
+softwares_raw = pd.read_csv(softwares_url)
+del softwares_url
+institution_softwares = preprocessing_groups_softwares(groups_raw, softwares_raw)
+```
+
 # Preprocessing researchers
 
 ```{python}
@@ -69,8 +102,29 @@ institution_researcher = preprocessing_groups_researchers(researchers_raw, group
 
 ```{python}
 # Merge the dataframes "institution_groups", "institution_papers", "institutions_chapters" and "institution_researcher" in a dataframe called "institution_data" using the column "instituciones"    
-institution_data = pd.merge(institution_groups, institution_papers, on='instituciones', how='outer')
-institution_data = pd.merge(institution_data, institution_chapters, on='instituciones', how='outer')
-institution_data = pd.merge(institution_data, institution_researcher, on='instituciones', how='outer')
+institution_data = pd.merge(institution_groups, 
+                            institution_papers, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_chapters, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_innovations, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_books, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_researcher, 
+                            on='instituciones', 
+                            how='outer')
+institution_data = pd.merge(institution_data, 
+                            institution_softwares, 
+                            on='instituciones', 
+                            how='outer')
 ```
 
